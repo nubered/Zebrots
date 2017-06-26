@@ -29,3 +29,7 @@ node_modules/
 bower_components/
 # Webstorm files
 *.idea
+
+#Kurt's editor's project files:
+*.prj
+*.pui
