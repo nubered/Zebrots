@@ -1,26 +1,35 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-// UNCOMMENT THE DATABASE YOU'D LIKE TO USE
-// var items = require('../database-mysql');
-// var items = require('../database-mongo');
+var db = require('../database-mysql/queries');
 
 var app = express();
 
-// UNCOMMENT FOR REACT
 app.use(express.static(__dirname + '/../react-client/dist'));
+app.use(bodyParser.json()); // augment the req with body property which will have json from the post's body
+app.use(bodyParser.urlencoded());
 
-// UNCOMMENT FOR ANGULAR
-// app.use(express.static(__dirname + '/../angular-client'));
-// app.use(express.static(__dirname + '/../node_modules'));
+app.get('/users', function (req, res) {
+  db.selectAll()
+    .then(results => {
+      console.log('these are the results from /users get', results);
+      res.status(200).end(JSON.stringify(results));
+    })
+    .catch(err => {
+      console.error('we have a error ', err);
+      res.status(500).end();
+    });
+});
 
-app.get('/items', function (req, res) {
-  items.selectAll(function(err, data) {
-    if(err) {
-      res.sendStatus(500);
-    } else {
-      res.json(data);
-    }
-  });
+app.post('/users', function (req, res) {
+  db.addUser(req.body)
+    .then(results => {
+      console.log('these are the results from /users post ', results);
+      res.status(201).end();
+    })
+    .catch(err => {
+      console.error('we have a error ', err);
+      res.status(500).end();
+    });
 });
 
 app.listen(3000, function() {

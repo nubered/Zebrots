@@ -3,18 +3,17 @@ var mysql = require('mysql');
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : 'FILL_ME_IN',
-  database : 'test'
+  password : '',
+  database : 'gravitas'
 });
 
-var selectAll = function(callback) {
-  connection.query('SELECT * FROM items', function(err, results, fields) {
-    if(err) {
-      callback(err, null);
-    } else {
-      callback(null, results);
-    }
-  });
-};
+connection.connect(function(err) {
+  if (err) {
+    console.log('Error connecting to mysql database');
+    throw err;
+  }
 
-module.exports.selectAll = selectAll;
+  console.log("Connected to mysql database!");
+});
+
+module.exports = connection;

@@ -1,16 +1,17 @@
-DROP DATABASE IF EXISTS test;
+DROP DATABASE IF EXISTS gravitas;
 
-CREATE DATABASE test;
+CREATE DATABASE gravitas;
 
-USE test;
+USE gravitas;
 
-CREATE TABLE items (
+CREATE TABLE users (
   id int NOT NULL AUTO_INCREMENT,
-  quantity integer NOT NULL,
-  description varchar(50) NOT NULL,
+  name varchar(30) NOT NULL,
+  email varchar(50) NOT NULL,
+  gitHub varchar(200) NOT NULL,
   PRIMARY KEY (ID)
 );
 
 /*  Execute this file from the command line by typing:
- *    mysql -u root < server/schema.sql
+ *    mysql -u root < schema.sql  // run this to drop the database and create it
  *  to create the database and the tables.*/
