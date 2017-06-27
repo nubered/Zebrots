@@ -23,7 +23,8 @@
     "start": "node server/index.js",
     "react-dev": "webpack -d --watch",
     "server-dev": "nodemon --inspect server/index.js",
-    "postinstall": "webpack --config webpack.config.js --progress --colors"
+    "build": "webpack --config ./webpack.config.js --progress --colors",
+    "postinstall": "npm run build"
   },
   "repository": {
     "type": "git",
