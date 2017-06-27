@@ -20,7 +20,7 @@
     "start": "node server/index.js",
     "react-dev": "webpack -d --watch",
     "server-dev": "nodemon --inspect server/index.js",
-    "postinstall": "webpack"
+    "heroku-postbuild": "webpack --config webpack.config.js"
   },
   "repository": {
     "type": "git",
