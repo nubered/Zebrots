@@ -6,7 +6,7 @@ var app = express();
 
 app.use(express.static(__dirname + '/../react-client/dist'));
 app.use(bodyParser.json()); // augment the req with body property which will have json from the post's body
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/users', function (req, res) {
   db.selectAll()
@@ -31,8 +31,22 @@ app.post('/users', function (req, res) {
       res.status(500).end();
     });
 });
-
+ 
 app.listen(3000, function() {
-  console.log('listening on port 3000!');
+  console.log('Began listening on port 3000 at', timeFormat(new Date()));
 });
 
+
+// THING KURT ADDED TO MAKE EASILY-READABLE TIME-STAMPS ON THE SERVER-START MESSAGES:
+
+timeFormat = function(time) {
+  let hours   = zeroes(time.getHours());
+  let minutes = zeroes(time.getMinutes());
+  let seconds = zeroes(time.getSeconds());
+  let timeString = hours + ':' + minutes + ':' + seconds;
+
+  function zeroes(number) {
+    return (number < 10) ? '0' + number : number;
+  }
+  return timeString;
+}

@@ -2,7 +2,7 @@ import React from 'react';
 import User from './User.jsx';
 
 const Users = ({users, addUser}) => (
-  <div>
+  <div className="users">
     <h4>Users Component</h4>
     <button onClick={addUser}>Add User</button>
     <div>There are { users.length } users.</div>

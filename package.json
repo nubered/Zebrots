@@ -26,12 +26,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hackreactor/hrsf77-mvp-starter.git"
+    "url": "git+https://github.com/Zebrots/Zebrots"
   },
   "author": "KKR",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/hackreactor/hrsf77-mvp-starter/issues"
+    "url": "https://github.com/Zebrots/Zebrots/issues"
   },
-  "homepage": "https://github.com/hackreactor/hrsf77-mvp-starter#readme"
+  "homepage": "https://github.com/Zebrots/Zebrots#readme"
 }
