@@ -1,0 +1,26 @@
+{
+  "name": "Gravitas",
+  "scripts": {
+  },
+  "env": {
+    "JAWSDB_URL": {
+      "required": true
+    },
+    "NODE_ENV": {
+      "required": true
+    },
+    "NODE_VERBOSE": {
+      "required": true
+    }
+  },
+  "formation": {
+  },
+  "addons": [
+    "jawsdb"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}
