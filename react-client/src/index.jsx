@@ -22,11 +22,9 @@ class App extends React.Component {
   }
 
   gitHubSignIn() {
-
     let clientId = '0e43b859aea47726fa84';
     let scopes = 'user';
     window.open(`https://github.com/login/oauth/authorize?client_id=${clientId}&scope=${scopes}`);
-    // window.open(`https://github.com/login/oauth/authorize?client_id=your-client-id`);
   }
 
   addUser() {
