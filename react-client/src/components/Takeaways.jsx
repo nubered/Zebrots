@@ -2,7 +2,7 @@ import React from 'react';
 import Takeaway from './Takeaway.jsx';
 
 const Takeaways = ({takeaways, addTakeaway}) => (
-  <div class="takeaways">
+  <div className="takeaways">
     <h4>Takeaways Component</h4>
     <button onClick={addTakeaway}>Add Takeaway</button>
     <div>There are { takeaways.length } takeaways.</div>

@@ -4,14 +4,23 @@ import $ from 'jquery';
 import Users from './components/Users.jsx';
 import Takeaways from './components/Takeaways.jsx';
 
+var takeaways = [
+  {id : 1, usernameQ : 'Kurt',   usernameA : 'Kamie',  date : '06/21/17', topic : 'Why are frameworks so burdensome', takeaway : 'Adulting is hard.'},
+  {id : 2, usernameQ : 'Kamie',  usernameA : 'Azmeer', date : '06/23/17', topic : 'Promisifying',                     takeaway : 'Don\'t just *do* something, *SIT* there!'},
+  {id : 3, usernameQ : 'Reuben', usernameA : 'David',  date : '06/25/17', topic : 'Is Angular God?',                  takeaway : 'Apparently \'i\' is just an *imaginary* number.'},
+  {id : 4, usernameQ : 'Ben',    usernameA : 'Daniel', date : '06/28/17', topic : 'Breaking Promises',                takeaway : 'Now we know *why* there is a no-open-drink-container rule.'},
+  {id : 5, usernameQ : 'Saikal', usernameA : 'Saloni', date : '06/29/17', topic : 'Where are my car keys?',           takeaway : 'Who knew semi-colons and colons were different things??'},
+  ]
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      users: []
+      users: [],
+      takeaways : takeaways,
     }
   }
-
+ 
   hitServer(url, data, method = 'GET', dataType = 'json') {
     return $.ajax({
       url: url,
@@ -48,18 +57,45 @@ class App extends React.Component {
     });
   }
 
-  componentWillMount() { // a lifecycle event that each component has (before render)
+  addTakeaway() {
+    let data = {user_id : '10', takeaway : 'We should have practiced writing Mocha tests...'};
+
+    this.hitServer('/takeaways', data, 'POST')
+      .then(results => {
+        console.log('TAKEAWAYS RETURNED = ', data);
+        this.displayTakeaways();
+      })
+      .catch(err => {
+        console.error('ERROR RETRIEVING TAKEAWAYS: ', err);
+      });
   }
 
-  componentDidMount() { // a lifecycle event that each component has (after render)
+  displayTakeaways() {
+    this.hitServer('/takeaways')
+    .then(takeaways => { // expect takeaways to be an array of takeaway objects
+        console.log('TAKEAWAYS RETURNED = ', takeaways);
+        this.setState({
+          takeaways: takeaways
+        });
+      })
+    .catch(err => {
+      console.error('ERROR RETRIEVING TAKEAWAYS: ', err);
+    });
+  }
+
+  componentWillMount() { // A lifecycle event that each component has (before render)
+  }
+
+  componentDidMount() { // A lifecycle event that each component has (after render)
     // Render has already occurred; Get users from database.
     this.displayUsers();
   }
 
   render () {
     return (<div>
-      <h1>users</h1>
+      <h1>APP COMPONENT</h1>
       <Users users={this.state.users}  addUser={this.addUser.bind(this)} />
+      <Takeaways takeaways={this.state.takeaways} addTakeaway={this.addTakeaway.bind(this)} />
     </div>)
   }
 }
