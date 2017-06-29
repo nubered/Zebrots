@@ -4,6 +4,9 @@ import $ from 'jquery';
 import Users from './components/Users.jsx';
 import Welcome from './components/Welcome.jsx';
 import Takeaways from './components/Takeaways.jsx';
+import ModalView from './components/ModalView.jsx';
+
+import {ModalContainer, ModalDialog} from 'react-modal-dialog';
 
 var takeaways = [
   {id : 1, usernameQ : 'Kurt',   usernameA : 'Kamie',  date : '06/21/17', topic : 'Why are frameworks so burdensome', takeaway : 'Adulting is hard.'},
@@ -19,7 +22,9 @@ class App extends React.Component {
     this.state = {
       users: [],
       session: {},
-      takeaways : takeaways
+      takeaways: takeaways,
+      showModal: false,
+      inviteSubmitted: false
     }
   }
 
@@ -113,16 +118,41 @@ class App extends React.Component {
 
   }
 
+  showModal() {
+    this.setState({showModal: true});
+  }
+
+  closeModal() {
+    this.setState({
+      showModal: false,
+      inviteSubmitted: false
+    });
+  }
+
+  post(event) {
+    event.preventDefault();
+    // this.closeModal();
+    this.setState({inviteSubmitted: true});
+    console.log('dialog submitted');
+  }
+
   render () {
     return (<div>
+      <button onClick={this.showModal.bind(this)}>Post</button>
       <h1>Gravitas</h1>
-      {Object.keys(this.state.session).length > 0 &&
-      <Welcome session={this.state.session} /> }
-      {Object.keys(this.state.session).length === 0 &&
-      <button onClick={this.gitHubSignIn.bind(this)}> Sign in with GitHub</button>}
-      <Users users={this.state.users}  />
-      <h1>APP COMPONENT</h1>
-      <Takeaways takeaways={this.state.takeaways} addTakeaway={this.addTakeaway.bind(this)} />
+      <ModalView
+        show={this.state.showModal}
+        closeMethod={this.closeModal.bind(this)}
+        post={this.post.bind(this)}
+        submitted={this.state.inviteSubmitted}
+      />
+      {/*{Object.keys(this.state.session).length > 0 &&*/}
+      {/*<Welcome session={this.state.session} /> }*/}
+      {/*{Object.keys(this.state.session).length === 0 &&*/}
+      {/*<button onClick={this.gitHubSignIn.bind(this)}> Sign in with GitHub</button>}*/}
+      {/*<Users users={this.state.users}  />*/}
+      {/*<h1>APP COMPONENT</h1>*/}
+      {/*<Takeaways takeaways={this.state.takeaways} addTakeaway={this.addTakeaway.bind(this)} />*/}
     </div>)
   }
 }

@@ -8,3 +8,14 @@
 button {
   padding: 15px;
 }
+
+input {
+  font-size: 30px;
+}
+input::-webkit-input-placeholder, ::-moz-placeholder { /* Firefox 19+ */
+  color: lightgray;
+}
+
+/*input[placeholder] {*/
+  /*color: pink;*/
+/*}*/
