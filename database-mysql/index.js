@@ -3,7 +3,7 @@ var mysql = require('mysql');
 var connectTo = process.env.JAWSDB_URL || {
   host     : 'localhost',
   user     : 'root',
-  password : 'chon',
+  password : '',
   database : 'gravitas'
 };
 
