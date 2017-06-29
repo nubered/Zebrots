@@ -29,8 +29,6 @@ node_modules/
 bower_components/
 # Webstorm files
 *.idea
-# Config files
-*.config.js
 
 #Kurt's editor's project files:
 *.prj
