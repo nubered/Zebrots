@@ -1,8 +1,12 @@
 import React from 'react';
 
-const Welcome = ({user}) => (
+const Welcome = ({session}) => (
   <div>
-    <div>Welcome Back {user.handle}</div>
+    <h2>Welcome {session.handle}</h2>
   </div>
 );
-export default User;
+export default Welcome;
+
+
+
+

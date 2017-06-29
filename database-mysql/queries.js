@@ -21,22 +21,11 @@ var createUser = function(user) {
                         VALUES (null, '${user.login}', '${user.email}', '${user.avatar_url}', '${user.github_token}')`);
 };
 
-var selectUser = function(user) {
-  return queryDatabase(`SELECT * FROM users WHERE users.email = '${user.email}'`);
+var selectUser = function(attribute) {
+  return queryDatabase(`SELECT * FROM users WHERE ${attribute.field} = '${attribute.value}'`);
 };
 
-// CREATE TABLE users (
-//   id int NOT NULL AUTO_INCREMENT,
-//   name varchar(30) NOT NULL,
-//   email varchar(50) NOT NULL,
-//   gitHub varchar(200) NOT NULL,
-//   PRIMARY KEY (ID)
-// );
-// let user = {
-//     avatar_url: '',
-//     login: '',
-//     email: ''
-//   };
+
 module.exports = {
   selectAll: selectAll,
   selectUser: selectUser,

@@ -10,6 +10,7 @@ var fs = require('fs');
 
 
 var app = express();
+app.use(express.static(__dirname + '/../react-client/dist')); // if after session, causes err-content-length-mismatch??
 
 var morgan = require('morgan'); // morgan is used for logging. See access.log in the current directory
 var accessLogStream = fs.createWriteStream(
@@ -28,9 +29,15 @@ app.use(session({
   store: new FileStore()
 }));
 
-app.use(express.static(__dirname + '/../react-client/dist'));
 app.use(bodyParser.json()); // augment the req with body property which will have json from the post's body
 app.use(bodyParser.urlencoded({ extended: false }));
+
+
+app.get('/redirect', function (req, res) {
+
+  res.redirect('/');
+
+});
 
 app.get('/login*', function (req, res) {
 
@@ -79,7 +86,7 @@ app.get('/login*', function (req, res) {
       user.login = login; // save user name
 
       // check if user exists
-      return db.selectUser(user);
+      return db.selectUser({field: 'email', value: user.email});
     })
     .then(userDB => {
       if(!userDB.length) { // no user, create a new user
@@ -91,7 +98,6 @@ app.get('/login*', function (req, res) {
     .then((userId) => { // userId will be a row or the id
       userId = parseInt(userId) ? userId : userId.insertId;
       req.session.uid = userId; // save the user id in the session
-      console.log('we have a user');
       res.redirect("/"); // redirect user back to home page
     })
     .catch(err => {
@@ -100,7 +106,31 @@ app.get('/login*', function (req, res) {
     })
 });
 
+app.get('/session', function (req, res) {
+
+  let userSession = {uid: req.session.uid || null};
+  if (!userSession.uid) {
+    res.status(200).end(JSON.stringify(userSession));
+  } else {
+    db.selectUser({field: 'id', value: userSession.uid})
+      .then(user => {
+        if(user.length) { // user found; set the handle
+          userSession.handle = user[0].handle;
+        } else { // user not found in db; clear session id
+          userSession.uid = null;
+        }
+        res.send(JSON.stringify(userSession));
+      })
+      .catch(err => {
+        console.error('we have a error ', err);
+        res.status(500).end();
+      });
+  }
+});
+
 app.get('/users', function (req, res) {
+
+  console.log('users get');
   db.selectAll()
     .then(results => {
       console.log('these are the results from /users get', results);
@@ -113,6 +143,7 @@ app.get('/users', function (req, res) {
 });
 
 app.post('/users', function (req, res) {
+  console.log('users post');
   db.addUser(req.body)
     .then(results => {
       console.log('these are the results from /users post ', results);

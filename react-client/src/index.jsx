@@ -2,12 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import Users from './components/Users.jsx';
+import Welcome from './components/Welcome.jsx';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      users: []
+      users: [],
+      session: {}
     }
   }
 
@@ -17,14 +19,14 @@ class App extends React.Component {
       method: method,
       contentType: method === 'POST' ? 'application/json' : 'application/x-www-form-urlencoded; charset=UTF-8',
       data: JSON.stringify(data),
-      dataType: method === 'GET' ? 'json' : 'html'
+      dataType: method === 'POST' ? 'html' : dataType
     })
   }
 
   gitHubSignIn() {
     let clientId = '0e43b859aea47726fa84';
     let scopes = 'user';
-    window.open(`https://github.com/login/oauth/authorize?client_id=${clientId}&scope=${scopes}`);
+    window.open(`https://github.com/login/oauth/authorize?client_id=${clientId}&scope=${scopes}`, '_self');
   }
 
   addUser() {
@@ -39,6 +41,18 @@ class App extends React.Component {
         console.error('we have a error ', err);
       });
   };
+
+  getUserSession() { // get a user if they have a session
+    // debugger;
+    this.hitServer('/session')
+      .then(session => {
+        if(session.uid) {
+          this.setState({
+            session: session
+          });
+        }
+      });
+  }
 
   displayUsers() {
     this.hitServer('/users')
@@ -58,14 +72,34 @@ class App extends React.Component {
 
   componentDidMount() { // a lifecycle event that each component has (after render)
     // Render has already occurred; Get users from database.
+    this.getUserSession();
     this.displayUsers();
+
+  }
+
+  // hitServer(url, data, method = 'GET', dataType = 'json') {
+  redirectMe() {
+    this.hitServer('/redirect', undefined, undefined, 'html')
+      .then(response => {
+        // debugger;
+        console.log('redirect success');
+      })
+      .catch(err => {
+        // debugger;
+        console.log('error during redirect');
+      })
+
   }
 
   render () {
     return (<div>
-      <h1>users</h1>
-      <button onClick={this.gitHubSignIn.bind(this)}> Sign in with GitHub</button>
-      <Users users={this.state.users}  addUser={this.addUser.bind(this)} />
+      <h1>Gravitas</h1>
+      {Object.keys(this.state.session).length > 0 &&
+      <Welcome session={this.state.session} /> }
+      {Object.keys(this.state.session).length === 0 &&
+      <button onClick={this.gitHubSignIn.bind(this)}> Sign in with GitHub</button>}
+      <button onClick={this.redirectMe.bind(this)}>redirect me home</button>
+      <Users users={this.state.users}  />
     </div>)
   }
 }
