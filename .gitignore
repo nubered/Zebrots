@@ -31,3 +31,10 @@ bower_components/
 *.idea
 # Config files
 *.config.js
+
+#Kurt's editor's project files:
+*.prj
+*.pui
+
+Environment Vars
+*.env

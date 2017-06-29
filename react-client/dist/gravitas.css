@@ -1,0 +1,35 @@
+
+ body {
+  background-color: #000000;
+}
+
+.users {
+  padding: 15px;
+  margin: 15px;
+  background-color: lightgrey;
+  color: #333377;
+  border-radius: 5px;
+}
+
+
+#app {
+  background-color: #222222;
+  color: #FF9944;
+  font: 15px OCR A;
+}
+
+.takeaways {
+  padding: 15px;
+  margin: 15px;
+  background-color: #442222;
+  color: #99BBDD;
+  border-radius: 5px;  
+}
+
+.takeaway {
+  padding: 15px;
+  margin: 15px;
+  background-color: #2D1C1C;
+  color: teal;
+  border-radius: 5px;  
+}

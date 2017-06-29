@@ -13,8 +13,9 @@
   "dependencies": {
     "bluebird": "^3.5.0",
     "body-parser": "^1.17.2",
-    "express": "^4.15.3",
     "express-session": "^1.15.3",
+    "express": "^4.15.3",
+    "is-builtin-module": "^1.0.0",
     "jquery": "^3.2.1",
     "mysql": "^2.13.0",
     "react": "^15.6.1",
@@ -24,19 +25,20 @@
     "session-file-store": "^1.0.0"
   },
   "scripts": {
+    "start": "node server/index.js",
     "react-dev": "webpack -d --watch",
     "server-dev": "nodemon --inspect server/index.js",
     "server": "nodemon server/index.js"
-
+    "heroku-postbuild": "webpack --config webpack.config.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hackreactor/hrsf77-mvp-starter.git"
+    "url": "git+https://github.com/Zebrots/Zebrots"
   },
   "author": "KKR",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/hackreactor/hrsf77-mvp-starter/issues"
+    "url": "https://github.com/Zebrots/Zebrots/issues"
   },
-  "homepage": "https://github.com/hackreactor/hrsf77-mvp-starter#readme"
+  "homepage": "https://github.com/Zebrots/Zebrots#readme"
 }
