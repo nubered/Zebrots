@@ -20,7 +20,7 @@ class App extends React.Component {
       takeaways : takeaways,
     }
   }
- 
+
   hitServer(url, data, method = 'GET', dataType = 'json') {
     return $.ajax({
       url: url,

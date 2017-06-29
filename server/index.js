@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var db = require('../database-mysql/queries');
 
 var app = express();
+app.set('port', (process.env.PORT || 3000));
 
 app.use(express.static(__dirname + '/../react-client/dist'));
 app.use(bodyParser.json()); // augment the req with body property which will have json from the post's body
@@ -31,9 +32,9 @@ app.post('/users', function (req, res) {
       res.status(500).end();
     });
 });
- 
-app.listen(3000, function() {
-  console.log('Began listening on port 3000 at', timeFormat(new Date()));
+
+app.listen(app.get('port'), function() {
+  console.log('Began listening on port' + app.get('port') + ' at ', timeFormat(new Date()));
 });
 
 

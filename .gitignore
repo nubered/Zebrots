@@ -33,3 +33,6 @@ bower_components/
 #Kurt's editor's project files:
 *.prj
 *.pui
+
+Environment Vars
+*.env
