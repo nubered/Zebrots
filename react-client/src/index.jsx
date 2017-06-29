@@ -113,20 +113,6 @@ class App extends React.Component {
 
   }
 
-  // hitServer(url, data, method = 'GET', dataType = 'json') {
-  redirectMe() {
-    this.hitServer('/redirect', undefined, undefined, 'html')
-      .then(response => {
-        // debugger;
-        console.log('redirect success');
-      })
-      .catch(err => {
-        // debugger;
-        console.log('error during redirect');
-      })
-
-  }
-
   render () {
     return (<div>
       <h1>Gravitas</h1>
@@ -134,7 +120,6 @@ class App extends React.Component {
       <Welcome session={this.state.session} /> }
       {Object.keys(this.state.session).length === 0 &&
       <button onClick={this.gitHubSignIn.bind(this)}> Sign in with GitHub</button>}
-      <button onClick={this.redirectMe.bind(this)}>redirect me home</button>
       <Users users={this.state.users}  />
       <h1>APP COMPONENT</h1>
       <Takeaways takeaways={this.state.takeaways} addTakeaway={this.addTakeaway.bind(this)} />

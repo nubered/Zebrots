@@ -4,3 +4,7 @@
     background-color: lightgrey;
     border-radius: 15px;
 }
+
+button {
+  padding: 15px;
+}
