@@ -151,8 +151,8 @@ ALTER TABLE `TAGS_JOIN_INVITES` ADD FOREIGN KEY (invite_id) REFERENCES `INVITES`
 -- Test Data
 -- ---
 
--- INSERT INTO `TAKEAWAYS` (`id`,`takeaway`,`user_id`) VALUES
--- ('','','');
+-- INSERT INTO `TAKEAWAYS` (`takeaway`,`user_id`) VALUES
+-- ('MySQL gets confused about where its files are >_<','5');
 -- INSERT INTO `INVITES` (`id`,`user_Q_id`,`topic`,`user_A_id`,`takeaway_id`,`timestamp`) VALUES
 -- ('','','','','','');
 -- INSERT INTO `USERS` (`id`,`username`,`email`,`github_id`) VALUES

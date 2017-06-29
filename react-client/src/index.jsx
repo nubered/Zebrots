@@ -5,6 +5,7 @@ import Users from './components/Users.jsx';
 import Welcome from './components/Welcome.jsx';
 import Takeaways from './components/Takeaways.jsx';
 
+/*
 var takeaways = [
   {id : 1, usernameQ : 'Kurt',   usernameA : 'Kamie',  date : '06/21/17', topic : 'Why are frameworks so burdensome', takeaway : 'Adulting is hard.'},
   {id : 2, usernameQ : 'Kamie',  usernameA : 'Azmeer', date : '06/23/17', topic : 'Promisifying',                     takeaway : 'Don\'t just *do* something, *SIT* there!'},
@@ -12,6 +13,7 @@ var takeaways = [
   {id : 4, usernameQ : 'Ben',    usernameA : 'Daniel', date : '06/28/17', topic : 'Breaking Promises',                takeaway : 'Now we know *why* there is a no-open-drink-container rule.'},
   {id : 5, usernameQ : 'Saikal', usernameA : 'Saloni', date : '06/29/17', topic : 'Where are my car keys?',           takeaway : 'Who knew semi-colons and colons were different things??'},
   ];
+*/
 
 class App extends React.Component {
   constructor(props) {
@@ -19,7 +21,9 @@ class App extends React.Component {
     this.state = {
       users: [],
       session: {},
-      takeaways : takeaways
+//      takeaways : takeaways
+      takeaways : [],
+      displayMode : 'takeaways',
     }
   }
 
@@ -48,7 +52,7 @@ class App extends React.Component {
         this.displayUsers();
       })
       .catch(err => {
-        console.error('we have a error ', err);
+        console.error('we have an error ', err);
       });
   }
 
@@ -73,7 +77,7 @@ class App extends React.Component {
         });
       })
     .catch(err => {
-      console.error('we have a error ', err);
+      console.error('we have an error ', err);
     });
   }
 
@@ -94,8 +98,9 @@ class App extends React.Component {
     this.hitServer('/takeaways')
     .then(takeaways => { // expect takeaways to be an array of takeaway objects
         console.log('TAKEAWAYS RETURNED = ', takeaways);
-        this.setState({
-          takeaways: takeaways
+        this.setState({ // INVOKING setState HERE AUTO-FORCES AN INVOCATION OF THE 'render' METHOD
+          takeaways : takeaways,
+          displayMode : 'takeaways',
         });
       })
     .catch(err => {
@@ -114,6 +119,7 @@ class App extends React.Component {
   }
 
   render () {
+    if(this.state.displayMode === 'invites') {
     return (<div>
       <h1>Gravitas</h1>
       {Object.keys(this.state.session).length > 0 &&
@@ -121,10 +127,44 @@ class App extends React.Component {
       {Object.keys(this.state.session).length === 0 &&
       <button onClick={this.gitHubSignIn.bind(this)}> Sign in with GitHub</button>}
       <Users users={this.state.users}  />
-      <h1>APP COMPONENT</h1>
+    </div>)
+    } else if(this.state.displayMode === 'takeaways') {
+    return (<div>
+      <h1>Gravitas</h1>
+      {Object.keys(this.state.session).length > 0 &&
+      <Welcome session={this.state.session} /> }
+      {Object.keys(this.state.session).length === 0 &&
+      <button onClick={this.gitHubSignIn.bind(this)}> Sign in with GitHub</button>}
       <Takeaways takeaways={this.state.takeaways} addTakeaway={this.addTakeaway.bind(this)} />
     </div>)
+    }
   }
 }
 
 ReactDOM.render(<App />, document.getElementById('app'));
+
+
+//  render () {
+//    if(this.state.displayMode === 'invites') {
+//    return (<div>
+//      <h1>GRAVITAS - APP COMPONENT</h1>
+//      <Users users={this.state.users}  addUser={this.addUser.bind(this)} />
+//    </div>)
+//    } else if(this.state.displayMode === 'takeaways') {
+//    return (<div>
+//      <h1>GRAVITAS - APP COMPONENT</h1>
+//      <Takeaways takeaways={this.state.takeaways} addTakeaway={this.addTakeaway.bind(this)} />
+//    </div>)
+//      }
+//  }
+//
+
+
+//  render () {
+//    return (<div>
+//      <h1>GRAVITAS - APP COMPONENT</h1>
+//      <Users users={this.state.users}  addUser={this.addUser.bind(this)} />
+//      <Takeaways takeaways={this.state.takeaways} addTakeaway={this.addTakeaway.bind(this)} />
+//    </div>)
+//  }
+//

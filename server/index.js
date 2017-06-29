@@ -136,7 +136,7 @@ app.get('/users', function (req, res) {
       res.status(200).end(JSON.stringify(results));
     })
     .catch(err => {
-      console.error('we have a error ', err);
+      console.error('we have an error ', err);
       res.status(500).end();
     });
 });
@@ -149,7 +149,7 @@ app.post('/users', function (req, res) {
       res.status(201).end();
     })
     .catch(err => {
-      console.error('we have a error ', err);
+      console.error('we have an error ', err);
       res.status(500).end();
     });
 });
