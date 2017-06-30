@@ -1,8 +1,9 @@
-.user {
+.user, .topic {
     padding: 15px;
     margin: 15px;
     background-color: lightgrey;
     border-radius: 15px;
+    color: black;
 }
 
 button {

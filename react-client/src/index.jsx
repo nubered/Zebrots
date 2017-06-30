@@ -49,14 +49,17 @@ class App extends React.Component {
   }
 
   getUserSession() { // get a user if they have a session
-    // debugger;
     this.hitServer('/session')
-      .then(user => {
-        if(user.length) {
+      .then(userObj => {
+        if(userObj.user.length) {
           this.setState({
-            session: user[0]
+            session: userObj.user[0]
           });
         }
+      })
+      .catch(err => {
+        debugger;
+        console.error('we have an error ', err);
       });
   }
 
@@ -92,12 +95,18 @@ class App extends React.Component {
       console.log('TAKEAWAYS RETURNED FROM SERVER = ', takeaways);
       this.setState({ // INVOKING setState HERE AUTO-FORCES AN INVOCATION OF THE 'render' METHOD
         takeaways : takeaways,
-        displayMode : 'takeaways',
+        displayMode : 'takeaways'
       });
     })
     .catch(err => {
       console.error('ERROR RETRIEVING TAKEAWAYS: ', err);
     });
+  }
+
+  displayTopics() {
+    this.setState({
+      displayMode: 'topics'
+    })
   }
 
   componentWillMount() { // A lifecycle event that each component has (before render)
@@ -131,7 +140,7 @@ class App extends React.Component {
 
     // figure out sanitation
     this.hitServer('/topics', {topic}, 'POST')
-      .then(response => {
+      .then(() => {
         this.setState({inviteSubmitted: true});
         this.display('/topics');
       })
@@ -154,6 +163,8 @@ class App extends React.Component {
   render () {
     return (<div>
       <button onClick={this.showModal.bind(this)}>Post</button>
+      <button onClick={this.displayTopics.bind(this)}> Display Topics</button>
+      <button onClick={this.displayTakeaways.bind(this)}> Display Takeaways </button>
       <h1>Gravitas</h1>
       <ModalView
         show={this.state.showModal}
@@ -169,7 +180,6 @@ class App extends React.Component {
       {(this.state.topics.length > 0 && this.state.displayMode === 'topics')
         && <Topics topics={this.state.topics} /> }
 
-      <button onClick={this.displayTakeaways.bind(this)}> Display Takeaways </button>}
       {(this.state.takeaways.length > 0 && this.state.displayMode === 'takeaways')
         && <Takeaways takeaways={this.state.takeaways} createTakeaway={this.createTakeaway.bind(this)} />}
 
