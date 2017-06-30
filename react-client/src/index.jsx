@@ -116,7 +116,7 @@ class App extends React.Component {
     this.hitServer('/topics', {topic}, 'POST')
       .then(response => {
         this.setState({inviteSubmitted: true});
-        this.displayTopics();
+        this.display('/topics');
       })
       .catch(err => {
         console.log('Error posting a topic ', err);

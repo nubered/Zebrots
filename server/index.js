@@ -8,6 +8,7 @@ var queryString = require('querystring');
 var path = require('path');
 var fs = require('fs');
 var security = require('./helpers/security');
+var dbHelper = require('./helpers/db');
 
 
 var app = express();
@@ -32,12 +33,6 @@ app.use(session({
 
 app.use(bodyParser.json()); // augment the req with body property which will have json from the post's body
 app.use(bodyParser.urlencoded({ extended: false }));
-
-app.get('/redirect', function (req, res) {
-
-  res.redirect('/');
-
-});
 
 app.get('/login*', function (req, res) {
 
@@ -135,52 +130,19 @@ app.post('/topics', function (req, res) {
     return;
   }
 
-  db.createTopic(req.body.topic, req.session.uid)
-    .then(results => {
-      console.log('these are the results from /invites post ', results);
-      res.status(201).end();
-    })
-    .catch(err => {
-      console.error('we have a error ', err);
-      res.status(500).end();
-    });
+  dbHelper.queryDB('topics', db.createTopic.bind(this, req.body.topic, req.session.uid), res, 'POST');
 });
 
 app.get('/topics', function (req, res) {
-
-  db.selectAll('topics')
-    .then(results => {
-      console.log('these are the results from /users get', results);
-      res.status(200).end(JSON.stringify({topics: results}));
-    })
-    .catch(err => {
-      console.error('we have a error ', err);
-      res.status(500).end();
-    });
+  dbHelper.queryDB('topics', db.selectAll.bind(this, 'topics'), res)
 });
 
 app.get('/users', function (req, res) {
-  db.selectAllUsers()
-    .then(results => {
-      console.log('these are the results from /users get', results);
-      res.status(200).end(JSON.stringify({users: results}));
-    })
-    .catch(err => {
-      console.error('we have a error ', err);
-      res.status(500).end();
-    });
+  dbHelper.queryDB('users', db.selectAllUsers, res);
 });
 
 app.post('/users', function (req, res) {
-  db.addUser(req.body)
-    .then(results => {
-      console.log('these are the results from /users post ', results);
-      res.status(201).end();
-    })
-    .catch(err => {
-      console.error('we have a error ', err);
-      res.status(500).end();
-    });
+  dbHelper.queryDB('users', db.addUser.bind(this, req.body), res, 'POST');
 });
 
 app.set('port', (process.env.PORT || 3000));
