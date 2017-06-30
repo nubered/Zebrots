@@ -8,6 +8,7 @@ import ModalView from './components/ModalView.jsx';
 import Topics from './components/Topics.jsx';
 
 
+/*
 var takeaways = [
   {id : 1, usernameQ : 'Kurt',   usernameA : 'Kamie',  date : '06/21/17', topic : 'Why are frameworks so burdensome', takeaway : 'Adulting is hard.'},
   {id : 2, usernameQ : 'Kamie',  usernameA : 'Azmeer', date : '06/23/17', topic : 'Promisifying',                     takeaway : 'Don\'t just *do* something, *SIT* there!'},
@@ -15,6 +16,7 @@ var takeaways = [
   {id : 4, usernameQ : 'Ben',    usernameA : 'Daniel', date : '06/28/17', topic : 'Breaking Promises',                takeaway : 'Now we know *why* there is a no-open-drink-container rule.'},
   {id : 5, usernameQ : 'Saikal', usernameA : 'Saloni', date : '06/29/17', topic : 'Where are my car keys?',           takeaway : 'Who knew semi-colons and colons were different things??'},
   ];
+*/
 
 class App extends React.Component {
   constructor(props) {
@@ -23,9 +25,10 @@ class App extends React.Component {
       users: [],
       topics: [],
       session: {},
-      takeaways: takeaways,
       showModal: false,
-      inviteSubmitted: false
+      inviteSubmitted: false,
+      takeaways : [],
+      displayMode : 'takeaways'
     }
   }
 
@@ -57,12 +60,25 @@ class App extends React.Component {
       });
   }
 
-  addTakeaway() {
+  displayUsers() {
+    this.hitServer('/users')
+    .then(users => { // expect users to be an array of user objects
+        console.log('these are the results ', users);
+        this.setState({
+          users: users
+        });
+      })
+    .catch(err => {
+      console.error('we have an error ', err);
+    });
+  }
+
+  createTakeaway() {
     let data = {user_id : '10', takeaway : 'We should have practiced writing Mocha tests...'};
 
     this.hitServer('/takeaways', data, 'POST')
       .then(results => {
-        console.log('TAKEAWAYS RETURNED = ', data);
+        console.log('NEW TAKEAWAY RETURNED = ', data);
         this.displayTakeaways();
       })
       .catch(err => {
@@ -73,11 +89,12 @@ class App extends React.Component {
   displayTakeaways() {
     this.hitServer('/takeaways')
     .then(takeaways => { // expect takeaways to be an array of takeaway objects
-        console.log('TAKEAWAYS RETURNED = ', takeaways);
-        this.setState({
-          takeaways: takeaways
-        });
-      })
+      console.log('TAKEAWAYS RETURNED FROM SERVER = ', takeaways);
+      this.setState({ // INVOKING setState HERE AUTO-FORCES AN INVOCATION OF THE 'render' METHOD
+        takeaways : takeaways,
+        displayMode : 'takeaways',
+      });
+    })
     .catch(err => {
       console.error('ERROR RETRIEVING TAKEAWAYS: ', err);
     });
@@ -123,7 +140,6 @@ class App extends React.Component {
       });
   }
 
-
   display(path) {
     this.hitServer(path)
       .then(stateObj => { // expect stateObj to be {property: value}
@@ -133,7 +149,6 @@ class App extends React.Component {
         debugger;
         console.error('error displaying state: ', err);
       });
-
   }
 
   render () {
@@ -148,13 +163,17 @@ class App extends React.Component {
       />
       {Object.keys(this.state.session).length > 0 &&
       <Welcome session={this.state.session} /> }
-
-      {this.state.topics.length > 0 && <Topics topics={this.state.topics} /> }
       {Object.keys(this.state.session).length === 0 &&
       <button onClick={this.gitHubSignIn.bind(this)}> Sign in with GitHub</button>}
+
+      {(this.state.topics.length > 0 && this.state.displayMode === 'topics')
+        && <Topics topics={this.state.topics} /> }
+
+      <button onClick={this.displayTakeaways.bind(this)}> Display Takeaways </button>}
+      {(this.state.takeaways.length > 0 && this.state.displayMode === 'takeaways')
+        && <Takeaways takeaways={this.state.takeaways} createTakeaway={this.createTakeaway.bind(this)} />}
+
       <Users users={this.state.users}  />
-      <h1>APP COMPONENT</h1>
-      <Takeaways takeaways={this.state.takeaways} addTakeaway={this.addTakeaway.bind(this)} />
     </div>)
   }
 }

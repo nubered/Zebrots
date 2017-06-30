@@ -14,6 +14,7 @@ var dbHelper = require('./helpers/db');
 var app = express();
 app.use(express.static(__dirname + '/../react-client/dist')); // if after session, causes err-content-length-mismatch??
 
+
 var morgan = require('morgan'); // morgan is used for logging. See access.log in the current directory
 var accessLogStream = fs.createWriteStream(
   path.join(__dirname, 'access.log'), {flags: 'a'}
@@ -123,6 +124,42 @@ app.get('/session', function (req, res) {
   }
 });
 
+app.get('/users', function (req, res) {
+
+  console.log('users get');
+  db.selectAll()
+    .then(results => {
+      console.log('these are the results from /users get', results);
+      res.status(200).end(JSON.stringify(results));
+    })
+    .catch(err => {
+      console.error('we have an error ', err);
+      res.status(500).end();
+    })
+});
+
+app.get('/session', function (req, res) {
+
+  let userSession = {uid: req.session.uid || null};
+  if (!userSession.uid) {
+    res.status(200).end(JSON.stringify(userSession));
+  } else {
+    db.selectUser({field: 'id', value: userSession.uid})
+      .then(user => {
+        if(user.length) { // user found; set the handle
+          userSession.handle = user[0].handle;
+        } else { // user not found in db; clear session id
+          userSession.uid = null;
+        }
+        res.send(JSON.stringify(userSession));
+      })
+      .catch(err => {
+        console.error('we have a error ', err);
+        res.status(500).end();
+      });
+  }
+});
+
 app.post('/topics', function (req, res) {
 
   if(!security.hasSession(req)) {
@@ -144,6 +181,36 @@ app.get('/users', function (req, res) {
 app.post('/users', function (req, res) {
   dbHelper.queryDB('users', db.addUser.bind(this, req.body), res, 'POST');
 });
+
+app.get('/takeaways', function (req, res) {
+
+  console.log('GET TAKEAWAYS REQUEST RECEIVED FROM CLIENT AT ', timeFormat(new Date()));
+  db.selectAllTakeaways()
+    .then(results => {
+      console.log('TAKEAWAYS RESULTS OBJECT = ', results);
+      res.status(200).end(JSON.stringify(results));
+    })
+    .catch(err => {
+      console.error('O NOZ, ERROR: ', err);
+      res.status(500).end();
+    });
+});
+
+app.post('/takeaways', function (req, res) {
+  console.log('POST NEW TAKEAWAY REQUEST RECEIVED FROM CLIENT AT ', timeFormat(new Date()));
+//  db.createTakeaway({takeaway: 'There are too many frameworks', user_id: 13})
+  db.createTakeaway(req.body)
+    .then(results => {
+      console.log('NEW TAKEAWAY RESULTS OBJECT = ', results);
+      res.status(201).end();
+    })
+    .catch(err => {
+      console.error('O NOZ, ERROR: ', err);
+      res.status(500).end();
+    });
+});
+
+// ==================================================================================//
 
 app.set('port', (process.env.PORT || 3000));
 app.listen(app.get('port'), function() {

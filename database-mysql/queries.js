@@ -34,10 +34,22 @@ var createTopic = function(topic, userId) {
                         VALUES (${userId}, '${topic}')`);
 };
 
+var selectAllTakeaways = function() {
+  return queryDatabase('SELECT * FROM takeaways');
+};
+
+var createTakeaway = function(takeaway) {
+  return queryDatabase(`INSERT INTO takeaways (id, takeaway, user_id)  
+                        VALUES (null, '${takeaway.takeaway}', '${takeaway.user_id}')`);
+};
+
 module.exports = {
   selectAllUsers: selectAllUsers,
   selectAll: selectAll,
   selectUser: selectUser,
   createUser: createUser,
-  createTopic: createTopic
+  createTopic: createTopic,
+  selectAllTakeaways: selectAllTakeaways,
+  createTakeaway: createTakeaway
 };
+

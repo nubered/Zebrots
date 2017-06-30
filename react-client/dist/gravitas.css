@@ -33,3 +33,13 @@
   color: teal;
   border-radius: 5px;  
 }
+
+#createTakeawayButton {
+  padding: 5px;
+  margin: 5px;
+  background-color: teal;
+  color: #2D1C1C;
+  border-radius: 5px;  
+  font: 15px OCR A;
+  font-weight: 900;
+}

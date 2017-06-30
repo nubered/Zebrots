@@ -44,7 +44,8 @@ CREATE TABLE `TOPICS` (
   `user_a_id` INTEGER NULL,
   `takeaway_id` INTEGER NULL,
   `timestamp` TIMESTAMP DEFAULT NOW(),
-  PRIMARY KEY (`id`)
+
+   PRIMARY KEY (`id`)
 );
 
 -- ---
@@ -128,11 +129,12 @@ CREATE TABLE `TAGS_JOIN_INVITES` (
 ALTER TABLE `TOPICS` ADD FOREIGN KEY (user_q_id) REFERENCES `USERS` (`id`);
 ALTER TABLE `TOPICS` ADD FOREIGN KEY (user_a_id) REFERENCES `USERS` (`id`);
 ALTER TABLE `TOPICS` ADD FOREIGN KEY (takeaway_id) REFERENCES `TAKEAWAYS` (`id`);
+
 ALTER TABLE `EVENTS` ADD FOREIGN KEY (user_id) REFERENCES `USERS` (`id`);
 ALTER TABLE `RSVP` ADD FOREIGN KEY (event_id) REFERENCES `EVENTS` (`id`);
 ALTER TABLE `RSVP` ADD FOREIGN KEY (user_id) REFERENCES `USERS` (`id`);
-ALTER TABLE `TAGS_JOIN_INVITES` ADD FOREIGN KEY (tag_id) REFERENCES `TAGS` (`id`);
-ALTER TABLE `TAGS_JOIN_INVITES` ADD FOREIGN KEY (invite_id) REFERENCES `TOPICS` (`id`);
+ALTER TABLE `TAGS_JOIN_TOPICS` ADD FOREIGN KEY (tag_id) REFERENCES `TAGS` (`id`);
+ALTER TABLE `TAGS_JOIN_TOPICS` ADD FOREIGN KEY (invite_id) REFERENCES `TOPICS` (`id`);
 
 -- ---
 -- Table Properties
@@ -151,8 +153,13 @@ ALTER TABLE `TAGS_JOIN_INVITES` ADD FOREIGN KEY (invite_id) REFERENCES `TOPICS` 
 -- Test Data
 -- ---
 
--- INSERT INTO `TAKEAWAYS` (`id`,`takeaway`,`user_id`) VALUES
--- ('','','');
+INSERT INTO `TAKEAWAYS` (`takeaway`,`user_id`) VALUES
+('MySQL gets confused about where its files are >_<','5');
+INSERT INTO `TAKEAWAYS` (`takeaway`,`user_id`) VALUES
+('Programming is fun!','7');
+INSERT INTO `TAKEAWAYS` (`takeaway`,`user_id`) VALUES
+('Pair-programming is hard','3');
+
 -- INSERT INTO `INVITES` (`id`,`user_Q_id`,`topic`,`user_A_id`,`takeaway_id`,`timestamp`) VALUES
 -- ('','','','','','');
 -- INSERT INTO `USERS` (`id`,`username`,`email`,`github_id`) VALUES
