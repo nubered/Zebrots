@@ -12,8 +12,12 @@ var queryDatabase = function(query) {
   });
 };
 
-var selectAll = function() {
+var selectAllUsers = function() {
   return queryDatabase('SELECT handle, email, avatar_url FROM users');
+};
+
+var selectAll = function(table) {
+  return queryDatabase(`SELECT * FROM ${table}`);
 };
 
 var createUser = function(user) {
@@ -25,9 +29,15 @@ var selectUser = function(attribute) {
   return queryDatabase(`SELECT * FROM users WHERE ${attribute.field} = '${attribute.value}'`);
 };
 
+var createTopic = function(topic, userId) {
+  return queryDatabase(`INSERT INTO topics (user_q_id, topic)
+                        VALUES (${userId}, '${topic}')`);
+};
 
 module.exports = {
+  selectAllUsers: selectAllUsers,
   selectAll: selectAll,
   selectUser: selectUser,
-  createUser: createUser
+  createUser: createUser,
+  createTopic: createTopic
 };

@@ -1,5 +1,6 @@
 import React from 'react';
 import {ModalContainer, ModalDialog} from 'react-modal-dialog';
+import $ from 'jquery';
 
 let ModalView = ({show, closeMethod, post, submitted}) => (
      <div>
@@ -12,7 +13,10 @@ let ModalView = ({show, closeMethod, post, submitted}) => (
               <div>
                 <h1>Ask a question and connect!</h1>
                 <form>
-                <input type="text" size="60" placeholder=" I can't quite grok React... Anyone down for a chat?" />
+                <input
+                  id="inputTopic" type="text" size="60"
+                  placeholder=" I haven't quite grokked React... Anyone down for a chat?"
+                />
                 <button onClick={post}>Connect</button>
                 </form>
               </div>

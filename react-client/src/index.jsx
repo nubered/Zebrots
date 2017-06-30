@@ -5,8 +5,8 @@ import Users from './components/Users.jsx';
 import Welcome from './components/Welcome.jsx';
 import Takeaways from './components/Takeaways.jsx';
 import ModalView from './components/ModalView.jsx';
+import Topics from './components/Topics.jsx';
 
-import {ModalContainer, ModalDialog} from 'react-modal-dialog';
 
 var takeaways = [
   {id : 1, usernameQ : 'Kurt',   usernameA : 'Kamie',  date : '06/21/17', topic : 'Why are frameworks so burdensome', takeaway : 'Adulting is hard.'},
@@ -21,6 +21,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       users: [],
+      topics: [],
       session: {},
       takeaways: takeaways,
       showModal: false,
@@ -44,19 +45,6 @@ class App extends React.Component {
     window.open(`https://github.com/login/oauth/authorize?client_id=${clientId}&scope=${scopes}`, '_self');
   }
 
-  addUser() {
-    let data = {name: 'beth', email: 'beth@gmail.com', gitHub: '14hj3kl3h4k1h4k3'};
-
-    this.hitServer('/users', data, 'POST')
-      .then(results => {
-        console.log('these are the results ', data);
-        this.displayUsers();
-      })
-      .catch(err => {
-        console.error('we have a error ', err);
-      });
-  }
-
   getUserSession() { // get a user if they have a session
     // debugger;
     this.hitServer('/session')
@@ -67,19 +55,6 @@ class App extends React.Component {
           });
         }
       });
-  }
-
-  displayUsers() {
-    this.hitServer('/users')
-    .then(users => { // expect users to be an array of user objects
-        console.log('these are the results ', users);
-        this.setState({
-          users: users
-        });
-      })
-    .catch(err => {
-      console.error('we have a error ', err);
-    });
   }
 
   addTakeaway() {
@@ -114,8 +89,8 @@ class App extends React.Component {
   componentDidMount() { // A lifecycle event that each component has (after render)
     // Render has already occurred; Get users from database.
     this.getUserSession();
-    this.displayUsers();
-
+    this.display('/users');
+    this.display('/topics')
   }
 
   showModal() {
@@ -129,11 +104,36 @@ class App extends React.Component {
     });
   }
 
-  post(event) {
+  post(event) { // post a topic
     event.preventDefault();
-    // this.closeModal();
-    this.setState({inviteSubmitted: true});
-    console.log('dialog submitted');
+    let topic = event.currentTarget.form.firstChild.value;
+    if(!topic.length) {
+      alert("Did you forget something?_O");
+      return;
+    }
+
+    // figure out sanitation
+    this.hitServer('/topics', {topic}, 'POST')
+      .then(response => {
+        this.setState({inviteSubmitted: true});
+        this.displayTopics();
+      })
+      .catch(err => {
+        console.log('Error posting a topic ', err);
+      });
+  }
+
+
+  display(path) {
+    this.hitServer(path)
+      .then(stateObj => { // expect stateObj to be {property: value}
+        this.setState(stateObj);
+      })
+      .catch(err => {
+        debugger;
+        console.error('error displaying state: ', err);
+      });
+
   }
 
   render () {
@@ -146,13 +146,15 @@ class App extends React.Component {
         post={this.post.bind(this)}
         submitted={this.state.inviteSubmitted}
       />
-      {/*{Object.keys(this.state.session).length > 0 &&*/}
-      {/*<Welcome session={this.state.session} /> }*/}
-      {/*{Object.keys(this.state.session).length === 0 &&*/}
-      {/*<button onClick={this.gitHubSignIn.bind(this)}> Sign in with GitHub</button>}*/}
-      {/*<Users users={this.state.users}  />*/}
-      {/*<h1>APP COMPONENT</h1>*/}
-      {/*<Takeaways takeaways={this.state.takeaways} addTakeaway={this.addTakeaway.bind(this)} />*/}
+      {Object.keys(this.state.session).length > 0 &&
+      <Welcome session={this.state.session} /> }
+
+      {this.state.topics.length > 0 && <Topics topics={this.state.topics} /> }
+      {Object.keys(this.state.session).length === 0 &&
+      <button onClick={this.gitHubSignIn.bind(this)}> Sign in with GitHub</button>}
+      <Users users={this.state.users}  />
+      <h1>APP COMPONENT</h1>
+      <Takeaways takeaways={this.state.takeaways} addTakeaway={this.addTakeaway.bind(this)} />
     </div>)
   }
 }

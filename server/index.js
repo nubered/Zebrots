@@ -1,12 +1,13 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var db = require('../database-mysql/queries');
-var gitHub = require('../server/github.config');
+var gitHub = require('./github.config');
 var promise = require('bluebird');
 var request = promise.promisifyAll(require('request'));
 var queryString = require('querystring');
 var path = require('path');
 var fs = require('fs');
+var security = require('./helpers/security');
 
 
 var app = express();
@@ -127,13 +128,42 @@ app.get('/session', function (req, res) {
   }
 });
 
-app.get('/users', function (req, res) {
+app.post('/topics', function (req, res) {
 
-  console.log('users get');
-  db.selectAll()
+  if(!security.hasSession(req)) {
+    res.status(400).end('Must sign in to post');
+    return;
+  }
+
+  db.createTopic(req.body.topic, req.session.uid)
+    .then(results => {
+      console.log('these are the results from /invites post ', results);
+      res.status(201).end();
+    })
+    .catch(err => {
+      console.error('we have a error ', err);
+      res.status(500).end();
+    });
+});
+
+app.get('/topics', function (req, res) {
+
+  db.selectAll('topics')
     .then(results => {
       console.log('these are the results from /users get', results);
-      res.status(200).end(JSON.stringify(results));
+      res.status(200).end(JSON.stringify({topics: results}));
+    })
+    .catch(err => {
+      console.error('we have a error ', err);
+      res.status(500).end();
+    });
+});
+
+app.get('/users', function (req, res) {
+  db.selectAllUsers()
+    .then(results => {
+      console.log('these are the results from /users get', results);
+      res.status(200).end(JSON.stringify({users: results}));
     })
     .catch(err => {
       console.error('we have a error ', err);
@@ -142,7 +172,6 @@ app.get('/users', function (req, res) {
 });
 
 app.post('/users', function (req, res) {
-  console.log('users post');
   db.addUser(req.body)
     .then(results => {
       console.log('these are the results from /users post ', results);
