@@ -26,7 +26,7 @@ var createUser = function(user) {
 };
 
 var selectUser = function(attribute) {
-  return queryDatabase(`SELECT * FROM users WHERE ${attribute.field} = '${attribute.value}'`);
+  return queryDatabase(`SELECT id, email, handle, avatar_url FROM users WHERE ${attribute.field} = '${attribute.value}'`);
 };
 
 var createTopic = function(topic, userId) {

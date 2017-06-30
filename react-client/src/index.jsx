@@ -48,10 +48,10 @@ class App extends React.Component {
   getUserSession() { // get a user if they have a session
     // debugger;
     this.hitServer('/session')
-      .then(session => {
-        if(session.uid) {
+      .then(user => {
+        if(user.length) {
           this.setState({
-            session: session
+            session: user[0]
           });
         }
       });
