@@ -25,9 +25,21 @@ var selectUser = function(attribute) {
   return queryDatabase(`SELECT * FROM users WHERE ${attribute.field} = '${attribute.value}'`);
 };
 
+var selectAllTakeaways = function() {
+  return queryDatabase('SELECT * FROM takeaways');
+};
+
+var createTakeaway = function(takeaway) {
+  return queryDatabase(`INSERT INTO takeaways (id, takeaway, user_id)  
+                        VALUES (null, '${takeaway.takeaway}', '${takeaway.user_id}')`);
+};
+
 
 module.exports = {
   selectAll: selectAll,
   selectUser: selectUser,
-  createUser: createUser
+  createUser: createUser,
+  selectAllTakeaways: selectAllTakeaways,
+  createTakeaway: createTakeaway,
 };
+

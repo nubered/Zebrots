@@ -10,7 +10,7 @@ var fs = require('fs');
 
 
 var app = express();
-app.use(express.static(__dirname + '/../react-client/dist')); // if after session, causes err-content-length-mismatch??
+app.use(express.static(__dirname + '/../react-client/dist')); // if after session, causes err-content-length-mismatch?? 
 
 var morgan = require('morgan'); // morgan is used for logging. See access.log in the current directory
 var accessLogStream = fs.createWriteStream(
@@ -31,6 +31,8 @@ app.use(session({
 
 app.use(bodyParser.json()); // augment the req with body property which will have json from the post's body
 app.use(bodyParser.urlencoded({ extended: false }));
+
+// ==================================================================================//
 
 app.get('/redirect', function (req, res) {
 
@@ -136,7 +138,7 @@ app.get('/users', function (req, res) {
       res.status(200).end(JSON.stringify(results));
     })
     .catch(err => {
-      console.error('we have a error ', err);
+      console.error('we have an error ', err);
       res.status(500).end();
     });
 });
@@ -149,10 +151,41 @@ app.post('/users', function (req, res) {
       res.status(201).end();
     })
     .catch(err => {
-      console.error('we have a error ', err);
+      console.error('we have an error ', err);
       res.status(500).end();
     });
 });
+
+
+app.get('/takeaways', function (req, res) {
+
+  console.log('GET TAKEAWAYS REQUEST RECEIVED FROM CLIENT AT ', timeFormat(new Date()));
+  db.selectAllTakeaways()
+    .then(results => {
+      console.log('TAKEAWAYS RESULTS OBJECT = ', results);
+      res.status(200).end(JSON.stringify(results));
+    })
+    .catch(err => {
+      console.error('O NOZ, ERROR: ', err);
+      res.status(500).end();
+    });
+});
+
+app.post('/takeaways', function (req, res) {
+  console.log('POST NEW TAKEAWAY REQUEST RECEIVED FROM CLIENT AT ', timeFormat(new Date()));
+//  db.createTakeaway({takeaway: 'There are too many frameworks', user_id: 13})
+  db.createTakeaway(req.body)
+    .then(results => {
+      console.log('NEW TAKEAWAY RESULTS OBJECT = ', results);
+      res.status(201).end();
+    })
+    .catch(err => {
+      console.error('O NOZ, ERROR: ', err);
+      res.status(500).end();
+    });
+});
+
+// ==================================================================================//
 
 app.set('port', (process.env.PORT || 3000));
 app.listen(app.get('port'), function() {
