@@ -86,7 +86,7 @@ class App extends React.Component {
 
     this.hitServer('/takeaways', data, 'POST')
       .then(results => {
-        console.log('TAKEAWAYS RETURNED = ', data);
+        console.log('NEW TAKEAWAY RETURNED = ', data);
         this.displayTakeaways();
       })
       .catch(err => {
@@ -97,7 +97,7 @@ class App extends React.Component {
   displayTakeaways() {
     this.hitServer('/takeaways')
     .then(takeaways => { // expect takeaways to be an array of takeaway objects
-      console.log('TAKEAWAYS RETURNED = ', takeaways);
+      console.log('TAKEAWAYS RETURNED FROM SERVER = ', takeaways);
       this.setState({ // INVOKING setState HERE AUTO-FORCES AN INVOCATION OF THE 'render' METHOD
         takeaways : takeaways,
         displayMode : 'takeaways',
