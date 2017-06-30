@@ -112,42 +112,6 @@ app.get('/session', function (req, res) {
   dbHelper.queryDB('user', db.selectUser.bind(this, {field: 'id', value: req.session.uid}), res);
 });
 
-app.get('/users', function (req, res) {
-
-  console.log('users get');
-  db.selectAll()
-    .then(results => {
-      console.log('these are the results from /users get', results);
-      res.status(200).end(JSON.stringify(results));
-    })
-    .catch(err => {
-      console.error('we have an error ', err);
-      res.status(500).end();
-    })
-});
-
-app.get('/session', function (req, res) {
-
-  let userSession = {uid: req.session.uid || null};
-  if (!userSession.uid) {
-    res.status(200).end(JSON.stringify(userSession));
-  } else {
-    db.selectUser({field: 'id', value: userSession.uid})
-      .then(user => {
-        if(user.length) { // user found; set the handle
-          userSession.handle = user[0].handle;
-        } else { // user not found in db; clear session id
-          userSession.uid = null;
-        }
-        res.send(JSON.stringify(userSession));
-      })
-      .catch(err => {
-        console.error('we have a error ', err);
-        res.status(500).end();
-      });
-  }
-});
-
 app.post('/topics', function (req, res) {
 
   if(!security.hasSession(req)) {
