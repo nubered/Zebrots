@@ -25,17 +25,13 @@ var selectUser = function(attribute) {
   return queryDatabase(`SELECT * FROM users WHERE ${attribute.field} = '${attribute.value}'`);
 };
 
+var selectAllTakeaways = function() {
+  return queryDatabase('SELECT * FROM takeaways');
+};
+
 var createTakeaway = function(takeaway) {
-  return new Promise((resolve, reject) => {
-    db.query(`INSERT INTO takeaways VALUES ('${takeaway.takeaway}', '${takeaway.user_id}')`,
-      function (err, results) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(results);
-      }
-    });
-  });
+  return queryDatabase(`INSERT INTO takeaways (id, takeaway, user_id)  
+                        VALUES (null, '${takeaway.takeaway}', '${takeaway.user_id}')`);
 };
 
 
@@ -43,7 +39,7 @@ module.exports = {
   selectAll: selectAll,
   selectUser: selectUser,
   createUser: createUser,
+  selectAllTakeaways: selectAllTakeaways,
   createTakeaway: createTakeaway,
 };
-
 

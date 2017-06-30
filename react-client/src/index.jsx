@@ -97,12 +97,12 @@ class App extends React.Component {
   displayTakeaways() {
     this.hitServer('/takeaways')
     .then(takeaways => { // expect takeaways to be an array of takeaway objects
-        console.log('TAKEAWAYS RETURNED = ', takeaways);
-        this.setState({ // INVOKING setState HERE AUTO-FORCES AN INVOCATION OF THE 'render' METHOD
-          takeaways : takeaways,
-          displayMode : 'takeaways',
-        });
-      })
+      console.log('TAKEAWAYS RETURNED = ', takeaways);
+      this.setState({ // INVOKING setState HERE AUTO-FORCES AN INVOCATION OF THE 'render' METHOD
+        takeaways : takeaways,
+        displayMode : 'takeaways',
+      });
+    })
     .catch(err => {
       console.error('ERROR RETRIEVING TAKEAWAYS: ', err);
     });
@@ -126,6 +126,8 @@ class App extends React.Component {
       <Welcome session={this.state.session} /> }
       {Object.keys(this.state.session).length === 0 &&
       <button onClick={this.gitHubSignIn.bind(this)}> Sign in with GitHub</button>}
+      {Object.keys(this.state.session).length === 0 &&
+      <button onClick={this.displayTakeaways.bind(this)}> Display Takeaways </button>}
       <Users users={this.state.users}  />
     </div>)
     } else if(this.state.displayMode === 'takeaways') {
@@ -135,6 +137,8 @@ class App extends React.Component {
       <Welcome session={this.state.session} /> }
       {Object.keys(this.state.session).length === 0 &&
       <button onClick={this.gitHubSignIn.bind(this)}> Sign in with GitHub</button>}
+      {Object.keys(this.state.session).length === 0 &&
+      <button onClick={this.displayTakeaways.bind(this)}> Display Takeaways </button>}
       <Takeaways takeaways={this.state.takeaways} addTakeaway={this.addTakeaway.bind(this)} />
     </div>)
     }
