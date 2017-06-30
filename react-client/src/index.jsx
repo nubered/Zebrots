@@ -81,7 +81,7 @@ class App extends React.Component {
     });
   }
 
-  addTakeaway() {
+  createTakeaway() {
     let data = {user_id : '10', takeaway : 'We should have practiced writing Mocha tests...'};
 
     this.hitServer('/takeaways', data, 'POST')
@@ -139,36 +139,10 @@ class App extends React.Component {
       <button onClick={this.gitHubSignIn.bind(this)}> Sign in with GitHub</button>}
       {Object.keys(this.state.session).length === 0 &&
       <button onClick={this.displayTakeaways.bind(this)}> Display Takeaways </button>}
-      <Takeaways takeaways={this.state.takeaways} addTakeaway={this.addTakeaway.bind(this)} />
+      <Takeaways takeaways={this.state.takeaways} createTakeaway={this.createTakeaway.bind(this)} />
     </div>)
     }
   }
 }
 
 ReactDOM.render(<App />, document.getElementById('app'));
-
-
-//  render () {
-//    if(this.state.displayMode === 'invites') {
-//    return (<div>
-//      <h1>GRAVITAS - APP COMPONENT</h1>
-//      <Users users={this.state.users}  addUser={this.addUser.bind(this)} />
-//    </div>)
-//    } else if(this.state.displayMode === 'takeaways') {
-//    return (<div>
-//      <h1>GRAVITAS - APP COMPONENT</h1>
-//      <Takeaways takeaways={this.state.takeaways} addTakeaway={this.addTakeaway.bind(this)} />
-//    </div>)
-//      }
-//  }
-//
-
-
-//  render () {
-//    return (<div>
-//      <h1>GRAVITAS - APP COMPONENT</h1>
-//      <Users users={this.state.users}  addUser={this.addUser.bind(this)} />
-//      <Takeaways takeaways={this.state.takeaways} addTakeaway={this.addTakeaway.bind(this)} />
-//    </div>)
-//  }
-//
