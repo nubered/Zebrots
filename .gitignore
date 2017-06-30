@@ -30,9 +30,12 @@ bower_components/
 # Webstorm files
 *.idea
 
-#Kurt's editor's project files:
+# Kurt's editor's project files:
 *.prj
 *.pui
 
-Environment Vars
+# Environment Vars
 *.env
+
+# Session data
+sessions/
