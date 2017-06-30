@@ -104,24 +104,12 @@ app.get('/login*', function (req, res) {
 
 app.get('/session', function (req, res) {
 
-  let userSession = {uid: req.session.uid || null};
-  if (!userSession.uid) {
-    res.status(200).end(JSON.stringify(userSession));
-  } else {
-    db.selectUser({field: 'id', value: userSession.uid})
-      .then(user => {
-        if(user.length) { // user found; set the handle
-          userSession.handle = user[0].handle;
-        } else { // user not found in db; clear session id
-          userSession.uid = null;
-        }
-        res.send(JSON.stringify(userSession));
-      })
-      .catch(err => {
-        console.error('we have a error ', err);
-        res.status(500).end();
-      });
+  if (!req.session.uid) { // uid starts at 1
+    res.status(200).end(JSON.stringify([]));
+    return;
   }
+
+  dbHelper.queryDB('user', db.selectUser.bind(this, {field: 'id', value: req.session.uid}), res);
 });
 
 app.get('/users', function (req, res) {
