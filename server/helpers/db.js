@@ -1,7 +1,11 @@
-var queryDB = (name, fn, res, method = 'GET') => {
+var queryDB = (name, fn, res, method = 'GET', callback) => {
   fn()
     .then(results => {
       console.log('these are the results from the query to the db ', results);
+      if(callback) {
+        callback();
+      }
+
       if(method === 'POST') {
         res.status(201).end();
         return;

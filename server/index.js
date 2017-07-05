@@ -105,11 +105,26 @@ app.get('/login*', function (req, res) {
 app.get('/session', function (req, res) {
 
   if (!req.session.uid) { // uid starts at 1
-    res.status(200).end(JSON.stringify([]));
+    res.status(200).end(JSON.stringify({user : []}));
     return;
   }
 
   dbHelper.queryDB('user', db.selectUser.bind(this, {field: 'id', value: req.session.uid}), res);
+});
+
+app.get('/user', function (req, res) {
+
+  if(!security.hasSession(req)) {
+    res.status(400).end('Must sign in to access');
+    return;
+  }
+
+  dbHelper.queryDB('user', db.selectUser.bind(this, {field: 'id', value: req.query.userId}), res);
+});
+
+app.get('/topics', function (req, res) {
+  let condition = 'WHERE user_a_id is null';
+  dbHelper.queryDB('topics', db.selectAll.bind(this, 'topics', condition), res)
 });
 
 app.post('/topics', function (req, res) {
@@ -119,11 +134,29 @@ app.post('/topics', function (req, res) {
     return;
   }
 
-  dbHelper.queryDB('topics', db.createTopic.bind(this, req.body.topic, req.session.uid), res, 'POST');
+let alertSocketsTopicCreated = function() {
+    io.sockets.emit('topicCreated');
+};
+
+  dbHelper.queryDB('topics', db.createTopic.bind(this, req.body.data, req.session.uid), res, 'POST', alertSocketsTopicCreated);
 });
 
-app.get('/topics', function (req, res) {
-  dbHelper.queryDB('topics', db.selectAll.bind(this, 'topics'), res)
+app.post('/connectTopic', function (req, res) {
+
+  if(!security.hasSession(req)) {
+    res.status(400).end('Must sign in to connect');
+    return;
+  }
+
+  console.log('in connect topics');
+  let condition = ` WHERE id = ${req.body.topicId}`;
+  let alertSocketsTopicConnected = function(user_q_id, user_a_id) {
+    console.log('alert sockets being called');
+    io.sockets.emit('topicConnected', {user_q_id, user_a_id}) }.bind(this, req.body.user_q_id, req.session.uid);
+
+  dbHelper.queryDB('topics', db.connectTopic.bind(this, req.body.topicId, req.session.uid, condition),
+                    res, 'POST', alertSocketsTopicConnected);
+
 });
 
 app.get('/users', function (req, res) {
@@ -151,8 +184,9 @@ app.get('/takeaways', function (req, res) {
 app.post('/takeaways', function (req, res) {
   console.log('POST NEW TAKEAWAY REQUEST RECEIVED FROM CLIENT AT ', timeFormat(new Date()));
 //  db.createTakeaway({takeaway: 'There are too many frameworks', user_id: 13})
-  db.createTakeaway(req.body)
+  db.createTakeaway(req.body.data.takeawayText )
     .then(results => {
+      let topicId = req.body.data.topicId
       console.log('NEW TAKEAWAY RESULTS OBJECT = ', results);
       res.status(201).end();
     })
@@ -165,9 +199,20 @@ app.post('/takeaways', function (req, res) {
 // ==================================================================================//
 
 app.set('port', (process.env.PORT || 3000));
-app.listen(app.get('port'), function() {
+let server = app.listen(app.get('port'), function() {
   console.log('Began listening on port' + app.get('port') + ' at ', timeFormat(new Date()));
 });
+
+let io = require('socket.io')(server);
+
+io.on('connection', (socket) => {
+  console.log('socket connection made to socket ', socket.id);
+  // socket.emit('connected', { userId: 1 });
+  //   console.log(data);
+  // });
+});
+
+
 
 
 // THING KURT ADDED TO MAKE EASILY-READABLE TIME-STAMPS ON THE SERVER-START MESSAGES:

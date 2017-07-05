@@ -1,11 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
-import Users from './components/Users.jsx';
+import io from 'socket.io-client';
+import User from './components/User.jsx';
 import Welcome from './components/Welcome.jsx';
 import Takeaways from './components/Takeaways.jsx';
 import ModalView from './components/ModalView.jsx';
 import Topics from './components/Topics.jsx';
+import helper from './helpers/utility.js';
+import {ModalContainer, ModalDialog} from 'react-modal-dialog';
+
 
 
 /*
@@ -23,13 +27,18 @@ class App extends React.Component {
     super(props);
     this.state = {
       users: [],
+      user: {},
       topics: [],
       session: {},
       showModal: false,
       inviteSubmitted: false,
-      takeaways : [],
-      displayMode : 'takeaways'
-    }
+      takeaways: [],
+      displayMode: 'topics',
+      modalUserMessage: '',
+      modalDisplay: {},
+      currentModal: '',
+      topicId: 0
+    };
   }
 
   hitServer(url, data, method = 'GET', dataType = 'json') {
@@ -37,7 +46,7 @@ class App extends React.Component {
       url: url,
       method: method,
       contentType: method === 'POST' ? 'application/json' : 'application/x-www-form-urlencoded; charset=UTF-8',
-      data: JSON.stringify(data),
+      data: method === 'POST' ? JSON.stringify(data) : data,
       dataType: method === 'POST' ? 'html' : dataType
     })
   }
@@ -63,32 +72,6 @@ class App extends React.Component {
       });
   }
 
-  displayUsers() {
-    this.hitServer('/users')
-    .then(users => { // expect users to be an array of user objects
-        console.log('these are the results ', users);
-        this.setState({
-          users: users
-        });
-      })
-    .catch(err => {
-      console.error('we have an error ', err);
-    });
-  }
-
-  createTakeaway() {
-    let data = {user_id : '10', takeaway : 'We should have practiced writing Mocha tests...'};
-
-    this.hitServer('/takeaways', data, 'POST')
-      .then(results => {
-        console.log('NEW TAKEAWAY RETURNED = ', data);
-        this.displayTakeaways();
-      })
-      .catch(err => {
-        console.error('ERROR RETRIEVING TAKEAWAYS: ', err);
-      });
-  }
-
   displayTakeaways() {
     this.hitServer('/takeaways')
     .then(takeaways => { // expect takeaways to be an array of takeaway objects
@@ -103,87 +86,204 @@ class App extends React.Component {
     });
   }
 
+  updateModalUserMessage(message) {
+    this.setState({
+      modalUserMessage: message
+    });
+  }
+
   displayTopics() {
     this.setState({
       displayMode: 'topics'
     })
   }
 
-  componentWillMount() { // A lifecycle event that each component has (before render)
-  }
+  setUpSockets() {
+    // set up sockets
+    const socket = io();
+    socket.connect('http://localhost:3000');
 
-  componentDidMount() { // A lifecycle event that each component has (after render)
-    // Render has already occurred; Get users from database.
-    this.getUserSession();
-    this.display('/users');
-    this.display('/topics')
-  }
+    socket.on('connect_error', function(err) {
+      console.log('error connecting to server');
+    });
 
-  showModal() {
-    this.setState({showModal: true});
-  }
+    socket.on('topicConnected', ({user_q_id, user_a_id}) => { // when a new topic has been picked up
 
-  closeModal() {
-    this.setState({
-      showModal: false,
-      inviteSubmitted: false
+      this.setState({topics: []}, () => {
+        this.display('/topics');
+      });
+
+      if(this.state.session.id === user_q_id) { // if the userId returned is this client, request collaborator info
+        this.updateModalUserMessage('On my way!');
+        this.display('/user', {userId: user_a_id}).
+        then(() => {
+          this.showModal('user');
+        });
+      }
+    });
+
+    socket.on('topicCreated', () => { // when a new topic has been picked up
+      this.display('/topics');
     });
   }
 
-  post(event) { // post a topic
+  componentDidMount() { // A lifecycle event that each component has (after render)
+    // Render has already occurred; get users from database.
+    this.getUserSession();
+    this.setUpSockets();
+    this.display('/topics');
+  }
+
+
+  showModal(name) {
+   this.setState({currentModal: name});
+
+    let display;
+    switch (name) {
+      case 'postTopic':
+        display = <div>
+                <h1>Ask a question and connect!</h1>
+                <form>
+                <input
+                  id="inputTopic" type="text" size="60"
+                  placeholder=" I haven't quite grokked React... Anyone down for a chat?"
+                />
+                <button onClick={this.post.bind(this, '/topics', null)}>Connect</button>
+                </form>
+              </div>;
+        break;
+
+      case 'topicPosted':
+        display = <div>
+                <h1>Thanks for connecting :-)</h1>
+                <h3>Your topic has been posted</h3>
+              </div>;
+        break;
+
+      case 'takeawayPosted':
+        display = <div>
+                <h1>Thanks for contributing your takeaway!</h1>
+                <h3>Together, the community is strong :-)</h3>
+              </div>;
+        break;
+
+      case 'user':
+        display = <div>
+          <h3>{this.state.modalUserMessage}</h3>
+          <User user={this.state.user[0]} />;
+        </div>;
+        break;
+
+      case 'postTakeaway':
+        display = <div>
+                <h1>Share what you learned...</h1>
+                <form>
+                <input
+                  id="inputTakeaway" type="text" size="60"
+                  placeholder=" What was the big takeaway?"
+                />
+                <button onClick={this.post.bind(this, '/takeaways', this.state.topicId)}>Connect</button>
+                </form>
+              </div>;
+        break;
+    }
+
+    this.setState({
+      modalDisplay: display,
+      showModal: true});
+  }
+
+  closeModal() {
+
+    debugger;
+    this.setState({
+      showModal: false,
+      user: {}
+    });
+
+    if(this.state.currentModal === 'user') {
+      this.showModal('postTakeaway')
+    }
+  }
+
+  post(path, topicId, event) {
+    debugger;
     event.preventDefault();
-    let topic = event.currentTarget.form.firstChild.value;
-    if(!topic.length) {
+    let data = event.currentTarget.form.firstChild.value;
+    if(!data.length) {
       alert("Did you forget something?_O");
       return;
     }
 
+    if(path === '/takeaways') {
+      data = {
+        takeawayText: data,
+        topicId: topicId
+      }
+    }
+
     // figure out sanitation
-    this.hitServer('/topics', {topic}, 'POST')
+    this.hitServer(path, {data}, 'POST')
       .then(() => {
-        this.setState({inviteSubmitted: true});
-        this.display('/topics');
+        if(path === '/topics') {
+          this.showModal('topicPosted');
+        } else if(path === '/takeaways') {
+          this.showModal('takeawayPosted');
+        }
       })
       .catch(err => {
         console.log('Error posting a topic ', err);
       });
   }
 
-  display(path) {
-    this.hitServer(path)
+  display(path, data) {
+    return new Promise((resolve, reject) => {
+      this.hitServer(path, data)
       .then(stateObj => { // expect stateObj to be {property: value}
-        this.setState(stateObj);
+        this.setState(stateObj, () => {
+          resolve() });
       })
       .catch(err => {
-        debugger;
         console.error('error displaying state: ', err);
+        reject(err);
       });
+    });
   }
 
+  updateTopicId(topicId) {
+    this.setState({topicId: topicId});
+  }
   render () {
     return (<div>
-      <button onClick={this.showModal.bind(this)}>Post</button>
+      <button onClick={this.showModal.bind(this, 'postTopic')}>Post</button>
       <button onClick={this.displayTopics.bind(this)}> Display Topics</button>
       <button onClick={this.displayTakeaways.bind(this)}> Display Takeaways </button>
       <h1>Gravitas</h1>
+
       <ModalView
         show={this.state.showModal}
         closeMethod={this.closeModal.bind(this)}
-        post={this.post.bind(this)}
-        submitted={this.state.inviteSubmitted}
+        display={this.state.modalDisplay}
       />
-      {Object.keys(this.state.session).length > 0 &&
+
+      {!helper.isEmpty(this.state.session) &&
       <Welcome session={this.state.session} /> }
-      {Object.keys(this.state.session).length === 0 &&
+
+      {helper.isEmpty(this.state.session) &&
       <button onClick={this.gitHubSignIn.bind(this)}> Sign in with GitHub</button>}
 
       {(this.state.topics.length > 0 && this.state.displayMode === 'topics')
-        && <Topics topics={this.state.topics} /> }
+        && <Topics topics={this.state.topics}
+                   userId={this.state.session.id}
+                   hitServer={this.hitServer}
+                   display={this.display.bind(this)}
+                   showModal={this.showModal.bind(this)}
+                   updateTopicId={this.updateTopicId.bind(this)}
+                   updateModalUserMessage={this.updateModalUserMessage.bind(this)}
+                   /> }
 
       {(this.state.takeaways.length > 0 && this.state.displayMode === 'takeaways')
         && <Takeaways takeaways={this.state.takeaways} createTakeaway={this.createTakeaway.bind(this)} />}
-
-      <Users users={this.state.users}  />
     </div>)
   }
 }

@@ -12,12 +12,12 @@ var queryDatabase = function(query) {
   });
 };
 
-var selectAllUsers = function() {
-  return queryDatabase('SELECT handle, email, avatar_url FROM users');
+var selectAllUsers = function(condition) {
+  return queryDatabase(`SELECT handle, email, avatar_url FROM users ${condition}`);
 };
 
-var selectAll = function(table) {
-  return queryDatabase(`SELECT * FROM ${table}`);
+var selectAll = function(table, condition = '') {
+  return queryDatabase(`SELECT * FROM ${table} ${condition}`);
 };
 
 var createUser = function(user) {
@@ -30,17 +30,22 @@ var selectUser = function(attribute) {
 };
 
 var createTopic = function(topic, userId) {
-  return queryDatabase(`INSERT INTO topics (user_q_id, topic)
-                        VALUES (${userId}, '${topic}')`);
+  return queryDatabase(`INSERT INTO topics (user_q_id, topic) VALUES (${userId}, '${topic}')`);
+};
+
+var connectTopic = function(topicId, userId, condition = '') {
+  return queryDatabase(`UPDATE topics SET user_a_id = ${userId} ${condition}`);
 };
 
 var selectAllTakeaways = function() {
-  return queryDatabase('SELECT * FROM takeaways');
+  return queryDatabase('SELECT topics.topic, uq.handle, ua.handle from topics ' +
+  'JOIN users uq on topics.user_q_id = uq.id' +
+  'JOIN users ua on topics.user_a_id = ua.id' +
+  'WHERE topics.id = 1');
 };
 
 var createTakeaway = function(takeaway) {
-  return queryDatabase(`INSERT INTO takeaways (id, takeaway, user_id)  
-                        VALUES (null, '${takeaway.takeaway}', '${takeaway.user_id}')`);
+  return queryDatabase(`INSERT INTO takeaways (id, takeaway) VALUES (null, '${takeaway}')`);
 };
 
 module.exports = {
@@ -50,6 +55,7 @@ module.exports = {
   createUser: createUser,
   createTopic: createTopic,
   selectAllTakeaways: selectAllTakeaways,
-  createTakeaway: createTakeaway
+  createTakeaway: createTakeaway,
+  connectTopic: connectTopic
 };
 
